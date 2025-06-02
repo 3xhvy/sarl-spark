@@ -1,0 +1,35 @@
+services:
+  jupyter:
+    image: jupyter/pyspark-notebook:python-3.10
+    container_name: jupyter
+    ports:
+      - 8888:8888
+      - 4040:4040
+      - 8080:8080
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - PYSPARK_PYTHON=python3
+      - PYSPARK_DRIVER_PYTHON=jupyter
+      - PYSPARK_DRIVER_PYTHON_OPTS=notebook
+      - PYSPARK_SUBMIT_ARGS=--packages graphframes:graphframes:0.8.3-spark3.4-s_2.12 pyspark-shell
+      - SPARK_WORKER_MEMORY=4G
+      - SPARK_WORKER_CORES=2
+    volumes:
+      - /home/hohoanghvy/IdeaProjects/hadoop-spark-project/input:/data/input
+      - /home/hohoanghvy/IdeaProjects/hadoop-spark-project/output:/data/output
+      - /home/hohoanghvy/IdeaProjects/hadoop-spark-project/notebook:/home/jovyan/school-lab
+      - /home/hohoanghvy/PycharmProjects/sarl-spark:/home/jovyan/sarl-spark
+      - /home/hohoanghvy/docker_container/hadoop-spark/jupyter-config:/home/jovyan/.jupyter
+      - ./jars:/opt/spark/jars
+    deploy:
+      resources:
+        limits:
+          memory: 16g # Hard limit for the container's total RAM
+          cpus: '6'   # Hard limit for the container's total CPU cores (as string or float)
+        reservations:
+          memory: 8g  # Soft reservation, Docker tries to ensure this much is available
+          cpus: '2'   # Soft reservation
+    networks:
+      - spark-network
+networks:
+  spark-network:
